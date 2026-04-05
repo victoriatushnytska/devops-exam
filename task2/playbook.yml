@@ -15,7 +15,7 @@
         state: present
         update_cache: yes
 
-    - name: Install Docker (required for Minikube)
+    - name: Install Docker
       apt:
         name: docker.io
         state: present
@@ -50,3 +50,14 @@
 
     - name: Start Minikube
       command: minikube start --driver=docker --force
+      ignore_errors: yes
+
+    - name: Enable Minikube Dashboard
+      command: minikube dashboard --url
+      async: 2592000 # Run in background
+      poll: 0
+
+    - name: Run kubectl proxy to expose dashboard
+      shell: nohup kubectl proxy --address="0.0.0.0" --port=8001 --accept-hosts='^.*' </dev/null >/dev/null 2>&1 &
+      async: 2592000
+      poll: 0
