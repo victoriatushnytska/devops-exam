@@ -12,6 +12,8 @@ jobs:
   ansible:
     name: "Run Ansible Playbook"
     runs-on: ubuntu-latest
+    env:
+      ANSIBLE_HOST_KEY_CHECKING: False
 
     steps:
       - name: Checkout Repository
@@ -26,7 +28,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/exam_key
           chmod 600 ~/.ssh/exam_key
 
-      - name: Run Ansible Playbook
+      - name: Ansible Dry Run (Перевірка правильності)
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        run: |
+          ansible-playbook -i task2/inventory.ini task2/playbook.yml --check
+
+      - name: Run Ansible Playbook (Реальне встановлення)
         env:
           DROPLET_IP: ${{ secrets.DROPLET_IP }}
         run: |
