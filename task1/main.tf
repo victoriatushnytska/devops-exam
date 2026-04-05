@@ -51,4 +51,11 @@ resource "digitalocean_droplet" "node" {
   size     = "s-2vcpu-4gb"
   image    = "ubuntu-24-04-x64"
   region   = var.region
-  vpc_
+  vpc_uuid = digitalocean_vpc.main.id
+  ssh_keys = [digitalocean_ssh_key.default.fingerprint]
+}
+
+resource "digitalocean_spaces_bucket" "main" {
+  name   = "${var.surname}-bucket"
+  region = var.region
+}
