@@ -1,0 +1,49 @@
+name: "Task 3: Application CI/CD"
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Оберіть середовище розгортання'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - release
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Develop Branch
+        if: github.event.inputs.environment == 'dev'
+        uses: actions/checkout@v3
+        with:
+          repository: YulianSalo/devops-exam-pt2
+          ref: develop
+
+      - name: Checkout Tag 1.0.0
+        if: github.event.inputs.environment == 'release'
+        uses: actions/checkout@v3
+        with:
+          repository: YulianSalo/devops-exam-pt2
+          ref: 1.0.0
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Dev Image
+        if: github.event.inputs.environment == 'dev'
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/exam-app:develop .
+          docker push ${{ secrets.DOCKER_USERNAME }}/exam-app:develop
+
+      - name: Build and Push Release Image
+        if: github.event.inputs.environment == 'release'
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/exam-app:1.0.0 .
+          docker push ${{ secrets.DOCKER_USERNAME }}/exam-app:1.0.0
