@@ -1,0 +1,33 @@
+name: "Task 2: Ansible CI/CD"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'task2/**'
+  workflow_dispatch:
+
+jobs:
+  ansible:
+    name: "Run Ansible Playbook"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Ansible
+        run: sudo apt-get update && sudo apt-get install -y ansible
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/exam_key
+          chmod 600 ~/.ssh/exam_key
+
+      - name: Run Ansible Playbook
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        run: |
+          ansible-playbook -i task2/inventory.ini task2/playbook.yml
