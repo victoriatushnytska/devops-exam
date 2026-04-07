@@ -47,3 +47,24 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/exam-app:1.0.0 .
           docker push ${{ secrets.DOCKER_USERNAME }}/exam-app:1.0.0
+          - name: Auto-Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 134.122.77.22
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 1. Завантажуємо свіжі образи з Docker Hub
+            docker pull victushn/exam-app:develop
+            docker pull victushn/exam-app:1.0.0
+            
+            # 2. Зупиняємо і видаляємо старі контейнери (якщо вони є)
+            docker stop app-dev || true
+            docker rm app-dev || true
+            
+            docker stop app-release || true
+            docker rm app-release || true
+            
+            # 3. Запускаємо нові версії автоматично
+            docker run -d --name app-dev -p 8002:8000 victushn/exam-app:develop
+            docker run -d --name app-release -p 8003:8000 victushn/exam-app:1.0.0
