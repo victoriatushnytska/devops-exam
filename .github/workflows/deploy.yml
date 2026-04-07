@@ -47,7 +47,8 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/exam-app:1.0.0 .
           docker push ${{ secrets.DOCKER_USERNAME }}/exam-app:1.0.0
-          - name: Auto-Deploy to Server
+
+      - name: Auto-Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 134.122.77.22
