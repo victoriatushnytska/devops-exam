@@ -51,7 +51,7 @@ jobs:
       - name: Auto-Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 134.122.77.22
+          host: 165.232.68.126
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
